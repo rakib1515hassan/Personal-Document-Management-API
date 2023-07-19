@@ -1,14 +1,39 @@
+import os
 from django.shortcuts import render
-from Account.models import Documents
+from django.db.models import Q
+from django.conf import settings
+from django.http import HttpResponse, Http404
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
+from Account.models import Documents
 from Document.serializers import DocumentsSerializers
+
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.db.models import Q
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
+
+
+# from PyPDF2 import PdfWriter, PdfReader
+import PyPDF4
+
+from docx2pdf import convert
+from docx import Document
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import pdfplumber
+
 
 
 # Create your views here.
+##-----------------------------( User )------------------------------------------------------
+
 # URL = ( http://127.0.0.1:8000/document/document-create/ )
 class UserDocumentsListCreateAPIView(generics.ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -36,6 +61,7 @@ class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAP
 
 
 
+##-----------------------------( Admin )------------------------------------------------------
 
 # URL = ( http://127.0.0.1:8000/document/admin/document-retrieve/ )
 class AdminDocumentsListAPIView(generics.ListAPIView):
@@ -59,6 +85,161 @@ class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyA
         if user.is_superuser == True:
             doc_id = self.kwargs['pk']
             return Documents.objects.filter(pk = doc_id)
+        
+
+
+
+## -----------------------------( Convert Document )----------------------------------------
+# URL = ( http://127.0.0.1:8000/document/convert-document/ )
+class ConvertDocumentsView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk = None, format=None):
+        id = pk
+        if id is not None:
+            try:
+                user_doc = Documents.objects.filter(id = id).first()
+                r_user = self.request.user
+
+                if user_doc.user == r_user:
+                    doc = Documents.objects.filter( Q(user=r_user) & Q(id = id) ).first()
+                    serializer = DocumentsSerializers(doc)
+                    return Response(serializer.data)
+                else:
+                    return Response( {'msg': 'This Document is not found.'} )
+
+            except Documents.DoesNotExist:
+                return Response( {'msg': 'This Document is not found.'} )
+            
+        user = request.user  # Get the current user
+        doc = Documents.objects.filter(user=user)
+        serializer = DocumentsSerializers(doc, many = True)
+        return Response( serializer.data, status= status.HTTP_200_OK )
+
+
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file', None)
+
+        if not file:
+            return Response({"error": "No file was submitted."}, status=status.HTTP_400_BAD_REQUEST)
+
+        file_format = request.data.get('file_format', '').lower()
+
+        if file_format not in ['pdf', 'docx', 'txt']:
+            return Response({"error": "Invalid file format. Only 'pdf', 'docx', and 'txt' are supported."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Save the uploaded file to the Documents model
+            document = Documents.objects.create(user=request.user, title=request.data.get('title', ''),
+                                                description=request.data.get('description', ''), file=file,
+                                                file_format=file_format)
+
+            # Convert the uploaded file to the desired format
+            if file_format == 'pdf':
+                if file.name.lower().endswith('.pdf'):
+                    # If the uploaded file is already a PDF, save it directly
+                    document.save()
+                else:
+                    # Convert to PDF
+                    pdf_buffer = BytesIO()
+                    c = canvas.Canvas(pdf_buffer, pagesize=letter)
+                    if file.content_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                        # Convert DOCX to PDF
+                        doc = Document(document.file)
+                        for para in doc.paragraphs:
+                            c.drawString(72, 800, para.text)
+                            c.showPage()
+                    elif file.content_type == 'text/plain':
+                        # Convert TXT to PDF
+                        text = document.file.read().decode('utf-8')
+                        c.drawString(72, 800, text)
+                        c.showPage()
+                    # Add more conditions for other file types if needed.
+                    c.save()
+                    pdf_buffer.seek(0)
+                    new_file = f'{os.path.splitext(file.name)[0]}.pdf'
+                    path = os.path.join(settings.MEDIA_ROOT, new_file)
+                    with open(path, 'wb') as f:
+                        f.write(pdf_buffer.read())
+                    document.file = new_file
+                    document.save()
+
+            elif file_format == 'docx':
+                if file.name.lower().endswith('.docx'):
+                    # If the uploaded file is already a DOCX, save it directly
+                    document.save()
+                else:
+                    # Convert to DOCX
+                    doc = Document()
+                    if file.content_type == 'application/pdf':
+                        # Convert PDF to DOCX
+                        pdf = pdfplumber.open(document.file)
+                        text = ''
+                        for page in pdf.pages:
+                            text += page.extract_text()
+                        pdf.close()
+                        doc.add_paragraph(text)
+                    elif file.content_type == 'text/plain':
+                        # Convert TXT to DOCX
+                        text = document.file.read().decode('utf-8')
+                        doc.add_paragraph(text)
+                    # Add more conditions for other file types if needed.
+                    new_file = f'{os.path.splitext(file.name)[0]}.docx'
+                    path = os.path.join(settings.MEDIA_ROOT, new_file)
+                    doc.save(path)
+                    document.file = new_file
+                    document.save()
+
+            elif file_format == 'txt':
+                # Convert to TXT (if the file is not already a TXT)
+                if file.content_type != 'text/plain':
+                    new_file = f'{os.path.splitext(file.name)[0]}.txt'
+                    path = os.path.join(settings.MEDIA_ROOT, new_file)
+                    with open(path, 'w', encoding='utf-8', errors='ignore') as f:
+                        f.write(document.file.read().decode('utf-8', errors='ignore'))
+                    document.file = new_file
+                    document.save()
+
+            # Serialize and return the converted file details
+            serializer = DocumentsSerializers(document)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
+
+## -----------------------------( Downloade Document )----------------------------------------
+# URL = ( http://127.0.0.1:8000/document/download-document/<int:file_id>/<str:doc_format>/ )
+class DownloadFileView(APIView):
+    def get(self, request, file_id, doc_format):
+        
+        document = get_object_or_404(Documents, id=file_id)
+        print("----------------------")
+        print("Got Request......")
+        print(f"File id = {file_id}, Formate = {doc_format}")
+        print("Document = ", document)
+        print("----------------------")
+
+        # Validate that the requested format is either 'pdf', 'docx', or 'txt'
+        if doc_format not in ['pdf', 'docx', 'txt']:
+            return HttpResponse("Invalid format. Only 'pdf', 'docx', and 'txt' formats are supported.", status=400)
+
+        # Get the file path and content type based on the requested format
+        file_path = document.file.path
+        content_type = f'application/{doc_format}'
+
+        # Set the appropriate response headers for the file download
+        response = HttpResponse(open(file_path, 'rb'), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+
+        return response
 
 
 

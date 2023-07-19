@@ -10,3 +10,4 @@ class DocumentsSerializers(serializers.ModelSerializer):
     class Meta:
         model = Documents
         fields = '__all__'
+        # fields = ['title', 'user', 'description', 'file', 'file_format']

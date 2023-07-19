@@ -13,4 +13,9 @@ urlpatterns = [
 
     path('admin/document-retrieve-update-delete/<int:pk>/', views.AdminDocumentsRetrieveUpdateDestroyAPIView.as_view()),
 
+    path('convert-document/', views.ConvertDocumentsView.as_view()),
+    path('convert-document/<int:pk>/', views.ConvertDocumentsView.as_view()),
+
+    path('download-document/<int:file_id>/<str:doc_format>/', views.DownloadFileView.as_view()),
+
 ]
