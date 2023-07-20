@@ -5,7 +5,7 @@ from Document import views
 
 
 urlpatterns = [
-    path('document-create/', views.UserDocumentsListCreateAPIView.as_view()),
+    path('user/document-display/', views.UserDocumentsListAPIView.as_view()),
 
     path('document-retrieve-update-delete/<int:pk>/', views.UserDocumentsRetrieveUpdateDestroyAPIView.as_view()),
 
@@ -13,8 +13,7 @@ urlpatterns = [
 
     path('admin/document-retrieve-update-delete/<int:pk>/', views.AdminDocumentsRetrieveUpdateDestroyAPIView.as_view()),
 
-    path('convert-document/', views.ConvertDocumentsView.as_view()),
-    path('convert-document/<int:pk>/', views.ConvertDocumentsView.as_view()),
+    path('convert-document/', views.UserDocumentsUplodeAPIView.as_view()),
 
     path('download-document/<int:file_id>/<str:doc_format>/', views.DownloadFileView.as_view()),
 

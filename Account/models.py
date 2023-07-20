@@ -21,7 +21,7 @@ class Documents(models.Model):
     description = models.CharField( max_length = 250 )
     file        = models.FileField( upload_to = 'Documents/')
     file_format = models.CharField( max_length = 30 )
-    create_at   = models.DateField( auto_now_add=True )
+    create_at   = models.DateField( auto_now =True )
 
     def __str__(self):
         return self.title

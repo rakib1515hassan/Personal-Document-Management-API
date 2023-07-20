@@ -2,6 +2,7 @@ import os
 from django.shortcuts import render
 from django.db.models import Q
 from django.conf import settings
+from django.utils.dateparse import parse_date
 from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -17,6 +18,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 
 
 # from PyPDF2 import PdfWriter, PdfReader
@@ -34,90 +36,11 @@ import pdfplumber
 # Create your views here.
 ##-----------------------------( User )------------------------------------------------------
 
-# URL = ( http://127.0.0.1:8000/document/document-create/ )
-class UserDocumentsListCreateAPIView(generics.ListCreateAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = DocumentsSerializers
-
-    def get_queryset(self):
-        user = self.request.user  # Get the current user
-        return Documents.objects.filter(user=user)
-
-
-
-
-# URL = ( http://127.0.0.1:8000/document/document-retrieve-update-delete/id/ )
-class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    serializer_class = DocumentsSerializers
-
-    def get_queryset(self):
-        user = self.request.user  # Get the current user
-        return Documents.objects.filter(user=user)
-    
-
-
-
-
-##-----------------------------( Admin )------------------------------------------------------
-
-# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve/ )
-class AdminDocumentsListAPIView(generics.ListAPIView):
-    queryset = Documents.objects.all()
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DocumentsSerializers
-
-
-
-
-
-# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/id/ )
-class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DocumentsSerializers
-
-    def get_queryset(self):
-        user = self.request.user  # Get the current user
-        if user.is_superuser == True:
-            doc_id = self.kwargs['pk']
-            return Documents.objects.filter(pk = doc_id)
-        
-
-
-
-## -----------------------------( Convert Document )----------------------------------------
 # URL = ( http://127.0.0.1:8000/document/convert-document/ )
-class ConvertDocumentsView(APIView):
+class UserDocumentsUplodeAPIView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk = None, format=None):
-        id = pk
-        if id is not None:
-            try:
-                user_doc = Documents.objects.filter(id = id).first()
-                r_user = self.request.user
-
-                if user_doc.user == r_user:
-                    doc = Documents.objects.filter( Q(user=r_user) & Q(id = id) ).first()
-                    serializer = DocumentsSerializers(doc)
-                    return Response(serializer.data)
-                else:
-                    return Response( {'msg': 'This Document is not found.'} )
-
-            except Documents.DoesNotExist:
-                return Response( {'msg': 'This Document is not found.'} )
-            
-        user = request.user  # Get the current user
-        doc = Documents.objects.filter(user=user)
-        serializer = DocumentsSerializers(doc, many = True)
-        return Response( serializer.data, status= status.HTTP_200_OK )
-
 
     def post(self, request, *args, **kwargs):
         file = request.FILES.get('file', None)
@@ -215,17 +138,17 @@ class ConvertDocumentsView(APIView):
 
 
 
-## -----------------------------( Downloade Document )----------------------------------------
+
 # URL = ( http://127.0.0.1:8000/document/download-document/<int:file_id>/<str:doc_format>/ )
 class DownloadFileView(APIView):
     def get(self, request, file_id, doc_format):
         
         document = get_object_or_404(Documents, id=file_id)
-        print("----------------------")
-        print("Got Request......")
-        print(f"File id = {file_id}, Formate = {doc_format}")
-        print("Document = ", document)
-        print("----------------------")
+        # print("----------------------")
+        # print("Got Request......")
+        # print(f"File id = {file_id}, Formate = {doc_format}")
+        # print("Document = ", document)
+        # print("----------------------")
 
         # Validate that the requested format is either 'pdf', 'docx', or 'txt'
         if doc_format not in ['pdf', 'docx', 'txt']:
@@ -240,6 +163,107 @@ class DownloadFileView(APIView):
         response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
 
         return response
+
+
+
+
+
+
+# URL = ( http://127.0.0.1:8000/document/document-create/ )
+class UserDocumentsListAPIView(generics.ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = DocumentsSerializers
+
+    search_fields = ['title', 'description', 'create_at', 'file_format']
+
+    def get_queryset(self):
+        user = self.request.user  # Get the current user
+        return Documents.objects.filter(user=user)
+    
+
+
+
+
+
+# URL = ( http://127.0.0.1:8000/document/document-retrieve-update-delete/id/ )
+class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = DocumentsSerializers
+
+    def get_queryset(self):
+        user = self.request.user  # Get the current user
+        return Documents.objects.filter(user=user)
+    
+
+
+
+
+
+
+
+
+
+
+##-----------------------------( Admin )------------------------------------------------------
+
+# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve/ )
+from rest_framework.authentication import BasicAuthentication
+
+class AdminDocumentsListAPIView(generics.ListAPIView):
+    queryset = Documents.objects.all()
+    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = DocumentsSerializers
+
+    filter_backends = [ SearchFilter ]
+    search_fields = {
+        'user__first_name': ['icontains'],
+        'user__last_name': ['icontains'],
+        'title': ['icontains'],
+        'description': ['icontains'],
+        'file_format': ['exact'],
+        # 'create_at': ['exact'],
+        'create_at': ['date'],
+    }
+
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # Custom handling for create_at search
+        create_at_search = self.request.query_params.get('create_at', None)
+        if create_at_search:
+            # Parse the date string to a Python date object
+            create_at_date = parse_date(create_at_search)
+            if create_at_date:
+                # Filter the queryset to get Documents with the specified create_at date
+                queryset = queryset.filter(create_at__date=create_at_date)
+
+        return queryset
+
+
+
+
+# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/id/ )
+class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    serializer_class = DocumentsSerializers
+
+    def get_queryset(self):
+        user = self.request.user  # Get the current user
+        if user.is_staff == True:
+            doc_id = self.kwargs['pk']
+            return Documents.objects.filter(pk = doc_id)
+        
+
+
+
+
+
 
 
 
