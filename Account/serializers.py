@@ -61,10 +61,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 # NOTE --------------------------------------( Login Serialize )--------------------------------------
 
 class UserLoginSerializer(serializers.ModelSerializer):
-  email = serializers.EmailField(max_length=255)
-  class Meta:
-    model = User
-    fields = ['email', 'password']
+    username = serializers.CharField(max_length=25)
+    class Meta:
+        model = User
+        fields = ['username', 'password']
 
 #_____________________________________________________________________________________________________
 

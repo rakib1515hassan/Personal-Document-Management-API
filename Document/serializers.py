@@ -4,10 +4,19 @@ User = get_user_model()
 
 from Account.models import Documents
 
+class UserSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 
+# class DocumentsSerializers(serializers.HyperlinkedModelSerializer):
 class DocumentsSerializers(serializers.ModelSerializer):
+    user = UserSerializers(read_only=True)
+    
     class Meta:
         model = Documents
         fields = '__all__'
-        # fields = ['title', 'user', 'description', 'file', 'file_format']
+        # fields = ['id', 'url', 'title', 'user', 'description', 'file', 'file_format']
+
+

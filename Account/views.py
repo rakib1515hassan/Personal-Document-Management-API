@@ -60,19 +60,17 @@ class UserLoginView(APIView):
     def post(self, request, format=None):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            email = serializer.data.get('email')
+            username = serializer.data.get('username')
             password = serializer.data.get('password')
-        
-            try:
-                usr = User.objects.get(email = email)
-                if usr:
-                    authenticate(username= usr.username , password=password)
-                    token = get_tokens_for_user(usr)   ## Token Genaret           
-                    return Response({'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
-                
-            except User.DoesNotExist:
-                return Response({'errors':{'non_field_errors':['Email or Password is not Valid']}}, status=status.HTTP_404_NOT_FOUND)
-        
+
+            user = authenticate(username= username , password=password)            
+
+            if user is not None:
+                token = get_tokens_for_user(user)   ## Token Genaret
+                return Response({'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'errors':{'non_field_errors':['Username or Password is not Valid']}}, status=status.HTTP_404_NOT_FOUND)
+                        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 #_________________________________________________________________________________________

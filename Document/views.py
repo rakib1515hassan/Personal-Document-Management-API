@@ -13,6 +13,7 @@ from Document.serializers import DocumentsSerializers
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.authentication import BasicAuthentication
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -36,7 +37,7 @@ import pdfplumber
 # Create your views here.
 ##-----------------------------( User )------------------------------------------------------
 
-# URL = ( http://127.0.0.1:8000/document/convert-document/ )
+# URL = ( http://127.0.0.1:8000/document/user/document-uplode/ )
 class UserDocumentsUplodeAPIView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     authentication_classes = [JWTAuthentication]
@@ -135,66 +136,50 @@ class UserDocumentsUplodeAPIView(APIView):
 
 
 
-
-
-
-
-# URL = ( http://127.0.0.1:8000/document/download-document/<int:file_id>/<str:doc_format>/ )
-class DownloadFileView(APIView):
-    def get(self, request, file_id, doc_format):
-        
-        document = get_object_or_404(Documents, id=file_id)
-        # print("----------------------")
-        # print("Got Request......")
-        # print(f"File id = {file_id}, Formate = {doc_format}")
-        # print("Document = ", document)
-        # print("----------------------")
-
-        # Validate that the requested format is either 'pdf', 'docx', or 'txt'
-        if doc_format not in ['pdf', 'docx', 'txt']:
-            return HttpResponse("Invalid format. Only 'pdf', 'docx', and 'txt' formats are supported.", status=400)
-
-        # Get the file path and content type based on the requested format
-        file_path = document.file.path
-        content_type = f'application/{doc_format}'
-
-        # Set the appropriate response headers for the file download
-        response = HttpResponse(open(file_path, 'rb'), content_type=content_type)
-        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
-
-        return response
-
-
-
-
-
-
-# URL = ( http://127.0.0.1:8000/document/document-create/ )
+# URL = ( http://127.0.0.1:8000/document/user/document-display/)
 class UserDocumentsListAPIView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
+    # authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = DocumentsSerializers
 
-    search_fields = ['title', 'description', 'create_at', 'file_format']
+    filter_backends = [ SearchFilter ]
+    search_fields = {
+        'user__first_name': ['icontains'],
+        'user__last_name': ['icontains'],
+        'title': ['icontains'],
+        'description': ['icontains'],
+        'file_format': ['exact'],
+        # 'create_at': ['exact'],
+        'create_at': ['date'],
+    }
 
     def get_queryset(self):
         user = self.request.user  # Get the current user
-        return Documents.objects.filter(user=user)
+        if self.request.user.is_staff == False:
+            return Documents.objects.filter(user=user)
+        else:
+            return Documents.objects.all()
     
 
 
 
 
 
-# URL = ( http://127.0.0.1:8000/document/document-retrieve-update-delete/id/ )
+# URL = ( http://127.0.0.1:8000/document/user/document-retrieve-update-delete/<int:pk>/)
 class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
+    # authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = DocumentsSerializers
 
     def get_queryset(self):
         user = self.request.user  # Get the current user
-        return Documents.objects.filter(user=user)
+        if user.is_staff == True:
+            doc_id = self.kwargs['pk']
+            return Documents.objects.filter(pk = doc_id)
+        else:
+            return Documents.objects.filter(user=user)
     
 
 
@@ -206,15 +191,13 @@ class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAP
 
 
 
-##-----------------------------( Admin )------------------------------------------------------
+##-----------------------------( Admin Pannel )------------------------------------------------------
 
 # URL = ( http://127.0.0.1:8000/document/admin/document-retrieve/ )
-from rest_framework.authentication import BasicAuthentication
-
 class AdminDocumentsListAPIView(generics.ListAPIView):
     queryset = Documents.objects.all()
-    # authentication_classes = [JWTAuthentication]
-    authentication_classes = [BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
     serializer_class = DocumentsSerializers
 
@@ -247,7 +230,7 @@ class AdminDocumentsListAPIView(generics.ListAPIView):
 
 
 
-# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/id/ )
+# URL = ( http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/<int:pk>/)
 class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
@@ -266,4 +249,22 @@ class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyA
 
 
 
+# URL = ( http://127.0.0.1:8000/document/download-document/<int:file_id>/<str:doc_format>/ )
+class DownloadFileView(APIView):
+    def get(self, request, file_id, doc_format):
+        
+        document = get_object_or_404(Documents, id=file_id)
 
+        # Validate that the requested format is either 'pdf', 'docx', or 'txt'
+        if doc_format not in ['pdf', 'docx', 'txt']:
+            return HttpResponse("Invalid format. Only 'pdf', 'docx', and 'txt' formats are supported.", status=400)
+
+        # Get the file path and content type based on the requested format
+        file_path = document.file.path
+        content_type = f'application/{doc_format}'
+
+        # Set the appropriate response headers for the file download
+        response = HttpResponse(open(file_path, 'rb'), content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{os.path.basename(file_path)}"'
+
+        return response
