@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fae435af-81da-40f1-9844-4be1d4d7b78d",
+		"_postman_id": "147f6339-885f-4344-883c-d4a092a09808",
 		"name": "Documents API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "28499106"
@@ -108,6 +108,9 @@
 				},
 				{
 					"name": "User Document Retrieve, Update and Delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [
@@ -118,10 +121,35 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU2OTQyLCJqdGkiOiIwOGZjNTQ1NzcxMDc0NDI5YTJjMmMyZWE3ZTMwNzJhNCIsInVzZXJfaWQiOjV9.2qvZxAh1QpcS-m-pXsnH8delWTWdnSM_89EiYcVX9UY",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTgyNjgyLCJqdGkiOiIzMjczYzI3ZDA5MzA0NDk0ODg3NTZlMGEzNDRhMGVkMCIsInVzZXJfaWQiOjV9.n3vD6Prz7tEuULvFbNlpgMpc2qpafgFP6ZTRAOuuD3M",
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Hassan cover letter",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "My name is Md Hassan and this is my cover letter.",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "file_format",
+									"value": "docx",
+									"type": "text"
+								}
+							]
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/document/user/document-retrieve-update-delete/76/",
 							"protocol": "http",
@@ -180,7 +208,10 @@
 					"response": []
 				},
 				{
-					"name": "Admin Modify",
+					"name": "Document Retrieve, Update and Delete",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"method": "GET",
 						"header": [
@@ -191,10 +222,35 @@
 							},
 							{
 								"key": "Authorization",
-								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU3NzkzLCJqdGkiOiIzZDQxY2RiOWUyYTY0ZWQ1ODllMjYxZTEwN2MxNGU4NSIsInVzZXJfaWQiOjF9.3nv7s-E0PfaCnbLhwOm1-xZ7xVV4Tzg1IxJFkiSpUQw",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTgyODUwLCJqdGkiOiI5OWUzYTJiNDVhNmY0ZGZmYWM4NTYzOWU5MmNhMjc1NSIsInVzZXJfaWQiOjF9.8J-uZxLYxL8XfvH-RnvUxevQpgXui92H5JIdWnp2SoU",
 								"type": "text"
 							}
 						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Hassan Certificate",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "My name is Md Hassan and this is my certificate.",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "file_format",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/75/",
 							"protocol": "http",
@@ -383,12 +439,12 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "rakib",
+									"value": "admin",
 									"type": "text"
 								},
 								{
 									"key": "password",
-									"value": "123456ra",
+									"value": "admin",
 									"type": "text"
 								}
 							]
