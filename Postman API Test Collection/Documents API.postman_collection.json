@@ -1,0 +1,642 @@
+{
+	"info": {
+		"_postman_id": "fae435af-81da-40f1-9844-4be1d4d7b78d",
+		"name": "Documents API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28499106"
+	},
+	"item": [
+		{
+			"name": "Document",
+			"item": [
+				{
+					"name": "User Document Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU2OTQyLCJqdGkiOiIwOGZjNTQ1NzcxMDc0NDI5YTJjMmMyZWE3ZTMwNzJhNCIsInVzZXJfaWQiOjV9.2qvZxAh1QpcS-m-pXsnH8delWTWdnSM_89EiYcVX9UY",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Hassan cover letter",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "My name is Md Hassan and this is my cover letter.",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/Z:/My Project/API Project/6. Personal Document Management API/dumi data/Hassan Cover letter.pdf"
+								},
+								{
+									"key": "file_format",
+									"value": "docx",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/user/document-uplode/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"user",
+								"document-uplode",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User All Document GET",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU2OTQyLCJqdGkiOiIwOGZjNTQ1NzcxMDc0NDI5YTJjMmMyZWE3ZTMwNzJhNCIsInVzZXJfaWQiOjV9.2qvZxAh1QpcS-m-pXsnH8delWTWdnSM_89EiYcVX9UY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/user/document-display/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"user",
+								"document-display",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Document Retrieve, Update and Delete",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU2OTQyLCJqdGkiOiIwOGZjNTQ1NzcxMDc0NDI5YTJjMmMyZWE3ZTMwNzJhNCIsInVzZXJfaWQiOjV9.2qvZxAh1QpcS-m-pXsnH8delWTWdnSM_89EiYcVX9UY",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/user/document-retrieve-update-delete/76/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"user",
+								"document-retrieve-update-delete",
+								"76",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin List View",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU3NzkzLCJqdGkiOiIzZDQxY2RiOWUyYTY0ZWQ1ODllMjYxZTEwN2MxNGU4NSIsInVzZXJfaWQiOjF9.3nv7s-E0PfaCnbLhwOm1-xZ7xVV4Tzg1IxJFkiSpUQw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/admin/document-retrieve/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"admin",
+								"document-retrieve",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Modify",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU3NzkzLCJqdGkiOiIzZDQxY2RiOWUyYTY0ZWQ1ODllMjYxZTEwN2MxNGU4NSIsInVzZXJfaWQiOjF9.3nv7s-E0PfaCnbLhwOm1-xZ7xVV4Tzg1IxJFkiSpUQw",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/admin/document-retrieve-update-delete/75/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"admin",
+								"document-retrieve-update-delete",
+								"75",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Downlode",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU4NjM2LCJqdGkiOiJjMjU1OTY1MWExMzQ0MmZmOWUxOTc4YjIwODRiYmI3MiIsInVzZXJfaWQiOjZ9.cnQYKfVzikuV59nMftTFI0BYZP9lPA_QbntMFPfIvPU",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/download-document/75/txt/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"download-document",
+								"75",
+								"txt",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sharing Document",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU3NzQyLCJqdGkiOiIzMGRmYTkzMjk2YmU0ZDE4ODhiZTdmYzU2YWQ2MzZhZCIsInVzZXJfaWQiOjZ9.CEb7CwkufdjstygpDGCwvUPE9QjxWFnZfeX8nx8WAJA",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:8000/document/user/documents-sharing/Hassan%20NID/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"document",
+								"user",
+								"documents-sharing",
+								"Hassan%20NID",
+								""
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Registrations",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "Mr",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "Rakib",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "rakib1515hassan@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "rakib",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456ra",
+									"type": "text"
+								},
+								{
+									"key": "password2",
+									"value": "123456ra",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/register/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "rakib",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "123456ra",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/login/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU1OTQ1LCJqdGkiOiIxZWFkZTVhNzU5N2Y0OGE2YjgzMmZiMTliMzI5N2QxYiIsInVzZXJfaWQiOjZ9.23klWVqaDJiLnxSnj8ep-aaFNk_4dLSh2yb6KC0bvJQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/profile/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjg5OTU1OTQ1LCJqdGkiOiIxZWFkZTVhNzU5N2Y0OGE2YjgzMmZiMTliMzI5N2QxYiIsInVzZXJfaWQiOjZ9.23klWVqaDJiLnxSnj8ep-aaFNk_4dLSh2yb6KC0bvJQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "1234567r",
+									"type": "text"
+								},
+								{
+									"key": "password2",
+									"value": "1234567r",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/change-password/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"change-password",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forget Password (OTP Send )",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "rakib1515hassan@gmail.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/reset-password-email-send/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"reset-password-email-send",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forget Password (OTP Verify and Set Password )",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "password",
+									"value": "123456ra",
+									"type": "text"
+								},
+								{
+									"key": "password2",
+									"value": "123456ra",
+									"type": "text"
+								},
+								{
+									"key": "otp",
+									"value": "627868",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/auth/reset-password-email-verify/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"reset-password-email-verify",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Access Token Generate",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "refresh",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY4OTc4NzcxMCwiaWF0IjoxNjg5NzAxMzEwLCJqdGkiOiIxMjVjODgzYzY5N2I0YTEzYmMwMmU2MDk2YTZiM2JlYyIsInVzZXJfaWQiOjJ9.m7QwPo5F6OWrhfV_ZyKmUW2QTCcG4BT2mvslvQOVeeo",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/auth/api/token/refresh/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"auth",
+						"api",
+						"token",
+						"refresh",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

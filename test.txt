@@ -1,0 +1,30 @@
+Personal Document Management API/
+|-- manage.py
+|-- requirements.txt
+|
+|-- Core/
+|   |-- settings.py
+|   |-- urls.py
+|   |-- ...
+|
+|-- Account/
+|   |-- migrations/
+|   |-- admin.py
+|   |-- models.py
+|   |-- serializers.py
+|   |-- views.py
+|   |-- urls.py
+|   |-- ...
+|
+|-- Document/
+|   |-- migrations/
+|   |-- admin.py
+|   |-- models.py
+|   |-- serializers.py
+|   |-- views.py
+|   |-- urls.py
+|   |-- ...
+|
+|-- static/
+|-- media/
+|-- templates/

@@ -8,8 +8,9 @@ urlpatterns = [
     path('user/document-uplode/', views.UserDocumentsUplodeAPIView.as_view()),
 
     path('user/document-display/', views.UserDocumentsListAPIView.as_view()),
+    path('user/documents-sharing/<str:title>/', views.DocumentsSharingDetailView.as_view(), name='documents-sharing'),
 
-    path('user/document-retrieve-update-delete/<int:pk>/', views.UserDocumentsRetrieveUpdateDestroyAPIView.as_view(), name='documents-detail'),
+    path('user/document-retrieve-update-delete/<int:pk>/', views.UserDocumentsRetrieveUpdateDestroyAPIView.as_view()),
 
     path('admin/document-retrieve/', views.AdminDocumentsListAPIView.as_view()),
 

@@ -9,7 +9,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 from Account.models import Documents
-from Document.serializers import DocumentsSerializers
+from Document.serializers import DocumentsSerializers, DocumentsSharingSerializers
 
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -20,6 +20,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.filters import SearchFilter
+from rest_framework.exceptions import PermissionDenied
 
 
 # from PyPDF2 import PdfWriter, PdfReader
@@ -118,8 +119,11 @@ class UserDocumentsUplodeAPIView(APIView):
                     document.save()
 
             elif file_format == 'txt':
+                if file.name.lower().endswith('.txt'):
+                    # If the uploaded file is already a TXT, save it directly
+                    document.save()
                 # Convert to TXT (if the file is not already a TXT)
-                if file.content_type != 'text/plain':
+                elif file.content_type != 'text/plain':
                     new_file = f'{os.path.splitext(file.name)[0]}.txt'
                     path = os.path.join(settings.MEDIA_ROOT, new_file)
                     with open(path, 'w', encoding='utf-8', errors='ignore') as f:
@@ -141,7 +145,7 @@ class UserDocumentsListAPIView(generics.ListAPIView):
     authentication_classes = [JWTAuthentication]
     # authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = DocumentsSerializers
+    serializer_class = DocumentsSharingSerializers
 
     filter_backends = [ SearchFilter ]
     search_fields = {
@@ -160,7 +164,16 @@ class UserDocumentsListAPIView(generics.ListAPIView):
             return Documents.objects.filter(user=user)
         else:
             return Documents.objects.all()
-    
+
+
+# URL ( http://127.0.0.1:8000/document/ user/documents-sharing/<str:title>/ )
+class DocumentsSharingDetailView(generics.RetrieveAPIView):
+    authentication_classes = [JWTAuthentication]
+    # authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Documents.objects.all()
+    serializer_class = DocumentsSharingSerializers
+    lookup_field = 'title'
 
 
 
@@ -186,20 +199,15 @@ class UserDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAP
 
 
 
-
-
-
-
-
 ##-----------------------------( Admin Pannel )------------------------------------------------------
 
 # URL = ( http://127.0.0.1:8000/document/admin/document-retrieve/ )
 class AdminDocumentsListAPIView(generics.ListAPIView):
     queryset = Documents.objects.all()
-    authentication_classes = [JWTAuthentication]
-    # authentication_classes = [BasicAuthentication]
+    # authentication_classes = [JWTAuthentication]
+    authentication_classes = [BasicAuthentication]
     permission_classes = [IsAuthenticated, IsAdminUser]
-    serializer_class = DocumentsSerializers
+    serializer_class = DocumentsSharingSerializers
 
     filter_backends = [ SearchFilter ]
     search_fields = {
@@ -251,9 +259,15 @@ class AdminDocumentsRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyA
 
 # URL = ( http://127.0.0.1:8000/document/download-document/<int:file_id>/<str:doc_format>/ )
 class DownloadFileView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, file_id, doc_format):
-        
         document = get_object_or_404(Documents, id=file_id)
+
+        # Check if the authenticated user is the owner of the file or a staff user
+        if not (document.user == request.user or request.user.is_staff):
+            raise PermissionDenied("You are not allowed to download this file.")
 
         # Validate that the requested format is either 'pdf', 'docx', or 'txt'
         if doc_format not in ['pdf', 'docx', 'txt']:
